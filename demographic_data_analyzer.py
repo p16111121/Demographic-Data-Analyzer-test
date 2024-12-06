@@ -3,35 +3,45 @@ import pandas as pd
 
 def calculate_demographic_data(print_data=True):
     # Read data from file
-    df = None
+    df = pd.read_csv('adult.data.csv')
 
     # How many of each race are represented in this dataset? This should be a Pandas series with race names as the index labels.
-    race_count = None
+    race_count = count.df[race_count].shape(0)
 
     # What is the average age of men?
-    average_age_men = None
+    average_age_men = df[df['sex'] == 'Male']['age'].mean()
+
 
     # What is the percentage of people who have a Bachelor's degree?
-    percentage_bachelors = None
+    
+    total_count = df.shape(0)
+    bachelors_count = df[df['education'] == 'Bachelors'].shape[0]
+    percentage_bachelors =(bachelors_count / total_count) * 100
 
     # What percentage of people with advanced education (`Bachelors`, `Masters`, or `Doctorate`) make more than 50K?
     # What percentage of people without advanced education make more than 50K?
 
     # with and without `Bachelors`, `Masters`, or `Doctorate`
-    higher_education = None
-    lower_education = None
+    higher_education = df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])
+    lower_education = ~df['education'].isin(['Bachelors','Masters','Doctorate'])
+
+
 
     # percentage with salary >50K
-    higher_education_rich = None
-    lower_education_rich = None
+    higher_education_rich = df[higher_education] & (df[salary]== '>50K')
+    lower_education_rich = df[lower_education] & (df[salary]== '>50K')
+
 
     # What is the minimum number of hours a person works per week (hours-per-week feature)?
-    min_work_hours = None
+    min_work_hours = df['hours-per-week'].min()
+
+
+
 
     # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
-    num_min_workers = None
+    num_min_workers = count.df[(min_work_hours)]
 
-    rich_percentage = None
+    rich_percentage = / total_count
 
     # What country has the highest percentage of people that earn >50K?
     highest_earning_country = None
