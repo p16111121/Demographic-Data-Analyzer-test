@@ -1,69 +1,56 @@
 import pandas as pd
 
+# Load the dataset (replace 'your_dataset.csv' with the actual filename)
+df = pd.read_csv('adult.data.csv')
 
 def calculate_demographic_data(print_data=True):
-    # Read data from file
-    df = None
+    # Initialize a dictionary to store results
+    data = {}
+    
+    # Calculating results
+    data['race_count'] = df['race'].value_counts().tolist()
+    data['average_age_men'] = round(df[df['sex'] == 'Male']['age'].mean(), 1)
+    total_count = df.shape[0]
+    data['percentage_bachelors'] = round((df[df['education'] == 'Bachelors'].shape[0] / total_count) * 100, 1)
 
-    # How many of each race are represented in this dataset? This should be a Pandas series with race names as the index labels.
-    race_count = None
+    # Higher education: Bachelors, Masters, or Doctorate
+    advanced_degrees = df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])
+    data['higher_education_rich'] = round((df[advanced_degrees & (df['salary'] == '>50K')].shape[0] / df[advanced_degrees].shape[0]) * 100, 1)
 
-    # What is the average age of men?
-    average_age_men = None
+    # Non-advanced education
+    non_advanced_degrees = ~df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])
+    data['lower_education_rich'] = round((df[non_advanced_degrees & (df['salary'] == '>50K')].shape[0] / df[non_advanced_degrees].shape[0]) * 100, 1)
 
-    # What is the percentage of people who have a Bachelor's degree?
-    percentage_bachelors = None
+    # Minimum hours per week
+    data['min_work_hours'] = df['hours-per-week'].min()
 
-    # What percentage of people with advanced education (`Bachelors`, `Masters`, or `Doctorate`) make more than 50K?
-    # What percentage of people without advanced education make more than 50K?
+    # Percentage of rich among those who work the minimum hours
+    min_hours = data['min_work_hours']
+    data['rich_percentage'] = round((df[(df['hours-per-week'] == min_hours) & (df['salary'] == '>50K')].shape[0] / df[df['hours-per-week'] == min_hours].shape[0]) * 100, 1)
 
-    # with and without `Bachelors`, `Masters`, or `Doctorate`
-    higher_education = None
-    lower_education = None
+    # Highest earning country
+    country_salary_counts = df[df['salary'] == '>50K']['native-country'].value_counts()
+    country_counts = df['native-country'].value_counts()
+    percentages = (country_salary_counts / country_counts) * 100
+    highest_country = percentages.idxmax()
+    highest_percentage = round(percentages.max(), 1)
+    data['highest_earning_country'] = highest_country
+    data['highest_earning_country_percentage'] = highest_percentage
 
-    # percentage with salary >50K
-    higher_education_rich = None
-    lower_education_rich = None
+    # Most popular occupation for those who earn >50K in India
+    data['top_IN_occupation'] = df[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].mode()[0]
 
-    # What is the minimum number of hours a person works per week (hours-per-week feature)?
-    min_work_hours = None
-
-    # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
-    num_min_workers = None
-
-    rich_percentage = None
-
-    # What country has the highest percentage of people that earn >50K?
-    highest_earning_country = None
-    highest_earning_country_percentage = None
-
-    # Identify the most popular occupation for those who earn >50K in India.
-    top_IN_occupation = None
-
-    # DO NOT MODIFY BELOW THIS LINE
-
+    # Print data if print_data is True
     if print_data:
-        print("Number of each race:\n", race_count) 
-        print("Average age of men:", average_age_men)
-        print(f"Percentage with Bachelors degrees: {percentage_bachelors}%")
-        print(f"Percentage with higher education that earn >50K: {higher_education_rich}%")
-        print(f"Percentage without higher education that earn >50K: {lower_education_rich}%")
-        print(f"Min work time: {min_work_hours} hours/week")
-        print(f"Percentage of rich among those who work fewest hours: {rich_percentage}%")
-        print("Country with highest percentage of rich:", highest_earning_country)
-        print(f"Highest percentage of rich people in country: {highest_earning_country_percentage}%")
-        print("Top occupations in India:", top_IN_occupation)
+        print("Race Count:", data['race_count'])
+        print("Average Age of Men:", data['average_age_men'])
+        print("Percentage of Bachelor's Degree Holders:", data['percentage_bachelors'])
+        print("Percentage of High Earners with Advanced Education:", data['higher_education_rich'])
+        print("Percentage of High Earners without Advanced Education:", data['lower_education_rich'])
+        print("Minimum Work Hours:", data['min_work_hours'])
+        print("Percentage of High Earners who Work Minimum Hours:", data['rich_percentage'])
+        print("Country with Highest Percentage of High Earners:", data['highest_earning_country'],
+              "with percentage:", data['highest_earning_country_percentage'])
+        print("Most Popular Occupation for High Earners in India:", data['top_IN_occupation'])
 
-    return {
-        'race_count': race_count,
-        'average_age_men': average_age_men,
-        'percentage_bachelors': percentage_bachelors,
-        'higher_education_rich': higher_education_rich,
-        'lower_education_rich': lower_education_rich,
-        'min_work_hours': min_work_hours,
-        'rich_percentage': rich_percentage,
-        'highest_earning_country': highest_earning_country,
-        'highest_earning_country_percentage':
-        highest_earning_country_percentage,
-        'top_IN_occupation': top_IN_occupation
-    }
+    return data
